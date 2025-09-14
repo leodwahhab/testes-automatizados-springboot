@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,9 +117,12 @@ class PlanetServiceTest {
 
     @Test
     public void deletePlanet_ByExistingId_ReturnTrue() {
-
+        assertDoesNotThrow(() -> planetService.delete(1L));
     }
 
     @Test
-    public void deletePlanet_ByUnexistingId_ThrowsException() {}
+    public void deletePlanet_ByUnexistingId_ThrowsException() {
+        doThrow(RuntimeException.class).when(planetRepository).deleteById(anyLong());
+        assertThrows(RuntimeException.class, () -> planetService.delete(1L));
+    }
 }
