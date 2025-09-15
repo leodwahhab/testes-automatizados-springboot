@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import static com.example.sw_planet_api.commons.PlanetConstants.INVALID_PLANET;
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,6 +32,18 @@ public class PlanetRepositoryTest {
 
     @Test
     public void createPlanet_WithInvalidData_ThrowsException() {
+        Planet emptyPlanet = new Planet(null, null, null);
 
+        assertThrows(RuntimeException.class, () -> planetRepository.save(INVALID_PLANET));
+        assertThrows(RuntimeException.class, () -> planetRepository.save(emptyPlanet));
+    }
+
+    @Test
+    public void createPlanet_WithExistingData_ThrowsException() {
+        Planet planet = entityManager.persistFlushFind(PLANET);
+        entityManager.detach(planet);
+        planet.setId(null);
+
+        assertThrows(RuntimeException.class, () -> planetRepository.save(planet));
     }
 }

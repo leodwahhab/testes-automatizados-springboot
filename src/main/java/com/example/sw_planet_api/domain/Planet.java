@@ -1,6 +1,7 @@
 package com.example.sw_planet_api.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "planet")
@@ -8,9 +9,23 @@ public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true)
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String climate;
+
+    @NotBlank
     private String terrain;
+
+    public Planet() {
+    }
+
+    public Planet(Long id, String name, String climate, String terrain) {
+        this.id = id;
+    }
 
     public Planet(String name, String climate, String terrain) {
         this.name = name;
