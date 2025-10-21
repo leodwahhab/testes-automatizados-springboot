@@ -2,7 +2,7 @@ package com.example.sw_planet_api.web;
 
 import com.example.sw_planet_api.domain.Planet;
 import com.example.sw_planet_api.domain.PlanetService;
-import jakarta.websocket.server.PathParam;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class PlanetController {
     PlanetService pLanetService;
 
     @PostMapping()
-    public ResponseEntity<?> create(@RequestBody Planet planet) {
+    public ResponseEntity<?> create(@RequestBody @Valid Planet planet) {
         return ResponseEntity.status(HttpStatus.CREATED).body(pLanetService.create(planet));
     }
 

@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.Optional;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.INVALID_PLANET;
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
@@ -45,5 +46,22 @@ public class PlanetRepositoryTest {
         planet.setId(null);
 
         assertThrows(RuntimeException.class, () -> planetRepository.save(planet));
+    }
+
+    @Test
+    public void getPlanet_ByExistingId_ReturnPlanet() {
+        Planet planet = entityManager.persistFlushFind(PLANET);
+
+        Optional<Planet> sut = planetRepository.findById(planet.getId());
+
+        assertTrue(sut.isPresent());
+        assertEquals(sut.get(), planet);
+    }
+
+    @Test
+    public void getPlanet_ByUnexistingId_ReturnEmpty() {
+        Optional<Planet> sut = planetRepository.findById(1L);
+
+        assertTrue(sut.isEmpty());
     }
 }

@@ -2,6 +2,7 @@ package com.example.sw_planet_api.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "planet")
@@ -14,7 +15,7 @@ public class Planet {
     @NotBlank
     private String name;
 
-    @NotBlank
+    @NotEmpty
     private String climate;
 
     @NotBlank
