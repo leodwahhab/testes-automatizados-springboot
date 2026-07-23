@@ -12,10 +12,12 @@ import org.springframework.data.domain.Example;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -116,13 +118,14 @@ class PlanetServiceTest {
     }
 
     @Test
-    public void deletePlanet_ByExistingId_ReturnTrue() {
-        assertDoesNotThrow(() -> planetService.delete(1L));
+    public void deletePlanet_ByExistingId_doesNotThrowException() {
+        assertThatCode(() -> planetService.delete(1L)).doesNotThrowAnyException();
     }
 
     @Test
     public void deletePlanet_ByUnexistingId_ThrowsException() {
-        doThrow(RuntimeException.class).when(planetRepository).deleteById(anyLong());
-        assertThrows(RuntimeException.class, () -> planetService.delete(1L));
+        doThrow(NoSuchElementException.class).when(planetRepository).deleteById(INVALID_ID);
+
+        assertThrows(NoSuchElementException.class, () -> planetService.delete(INVALID_ID));
     }
 }
