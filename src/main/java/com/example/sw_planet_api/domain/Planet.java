@@ -1,9 +1,11 @@
 package com.example.sw_planet_api.domain;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "planet")
+@Data
 public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

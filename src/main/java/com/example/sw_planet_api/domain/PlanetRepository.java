@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PlanetRepository extends JpaRepository<Planet, Long>, QueryByExampleExecutor<Planet> {
+public interface PlanetRepository extends JpaRepository<Planet, Long> {
     Optional<Planet> findByName(String name);
-
-    @Override
-    <S extends Planet> List<S> findAll(Example<S> example);
 }

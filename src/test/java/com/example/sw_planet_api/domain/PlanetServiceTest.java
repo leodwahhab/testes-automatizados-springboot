@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -56,7 +57,7 @@ class PlanetServiceTest {
 
     @Test
     public void getPlanet_ByExistingId_ReturnPlanet() {
-        when(planetService.get(anyLong())).thenReturn(Optional.of(PLANET));
+        when(planetService.get(1L)).thenReturn(Optional.of(PLANET));
 
         Optional<Planet> sut = planetService.get(1L);
 
@@ -85,9 +86,8 @@ class PlanetServiceTest {
 
     @Test
     public void getPLanet_ByUnexistingName_ReturnEmpty() {
-        String unexistingName = "Unexisting Name";
-
         when(planetService.getByName(anyString())).thenReturn(Optional.empty());
+        String unexistingName = "Unexisting Name";
 
         Optional<Planet> sut = planetService.getByName(unexistingName);
 
@@ -96,12 +96,12 @@ class PlanetServiceTest {
 
     @Test
     public void getPlanets_ByExistingClimateAndTerrain_ReturnPlanets() {
-        when(planetRepository.findAll(any(Example.class))).thenReturn(List.of(PLANET));
+        Example<Planet> query = QueryBuilder.buildQuery(new Planet(PLANET.getClimate(), PLANET.getTerrain()));
+        when(planetRepository.findAll(query)).thenReturn(List.of(PLANET));
 
         List<Planet> sut = planetService.getByTerrainAndClimate(PLANET.getClimate(), PLANET.getTerrain());
-        assertFalse(sut.isEmpty());
-        assertEquals(PLANET, sut.getFirst());
-        assertEquals(1, sut.size());
+        assertThat(sut.size()).isEqualTo(1);
+        assertThat(sut.getFirst()).isEqualTo(PLANET);
     }
 
     @Test
