@@ -2,10 +2,12 @@ package com.example.sw_planet_api.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "planet")
-@Data
 public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
