@@ -1,6 +1,8 @@
 package com.example.sw_planet_api.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,8 +14,17 @@ public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    @NotBlank
     private String name;
+
+    @Column(nullable = false)
+    @NotBlank
     private String climate;
+
+    @Column(nullable = false)
+    @NotBlank
     private String terrain;
 
     public Planet(String name, String climate, String terrain) {

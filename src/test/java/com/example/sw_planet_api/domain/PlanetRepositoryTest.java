@@ -9,6 +9,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 @DataJpaTest
 public class PlanetRepositoryTest {
@@ -39,6 +40,24 @@ public class PlanetRepositoryTest {
         assertThat(sut.getName()).isEqualTo(expected.getName());
         assertThat(sut.getClimate()).isEqualTo(expected.getClimate());
         assertThat(sut.getTerrain()).isEqualTo(expected.getTerrain());
+    }
 
+    @Test
+    void createPlanet_withInvalidData_ThrowsException() {
+        Planet nullsPlanet = new Planet();
+        Planet emptyPlanet = new Planet("", "", "");
+        Planet blankPlanet = new Planet(" ", " ", " ");
+
+        assertThatThrownBy(() -> planetRepository.save(nullsPlanet)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> planetRepository.save(emptyPlanet)).isInstanceOf(RuntimeException.class);
+        assertThatThrownBy(() -> planetRepository.save(blankPlanet)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void createPlanet_withExistingName_ThrowsException() {
+        testEntityManager.persistAndFlush(PLANET);
+        Planet existingNamePlanet = new Planet(PLANET.getName(), "climateEx", "terrainEx");
+
+        assertThatThrownBy(() -> planetRepository.save(existingNamePlanet)).isInstanceOf(RuntimeException.class);
     }
 }
