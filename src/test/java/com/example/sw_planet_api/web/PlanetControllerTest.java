@@ -11,9 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
+import static com.example.sw_planet_api.commons.PlanetConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -75,7 +76,7 @@ public class PlanetControllerTest {
 
     @Test
     void getPlanet_byExistingId_shouldReturnPlanet() throws Exception {
-        when(planetService.get(1L)).thenReturn(Optional.of(PLANET));
+        when(planetService.get(VALID_ID)).thenReturn(Optional.of(PLANET));
 
         mockMvc.perform(get("/planets/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -103,4 +104,30 @@ public class PlanetControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    void listPlanets_ByExistingClimateAndTerrain_shouldReturnListWithPlanets() throws Exception {
+        when(planetService.getByTerrainAndClimate(null, null)).thenReturn(PLANETS);
+        when(planetService.getByTerrainAndClimate(TATOOINE.getClimate(), TATOOINE.getTerrain())).thenReturn(List.of(TATOOINE));
+
+        mockMvc.perform(get("/planets").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$.size()").value(3));
+
+        // por algum motivo tem que se usar o string format pra testar os request parameters
+        mockMvc.perform(get("/planets?" + String.format("terrain=%s&climate=%s", TATOOINE.getClimate(), TATOOINE.getTerrain())).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isNotEmpty())
+                .andExpect(jsonPath("$[0]").value(TATOOINE));
+    }
+
+    @Test
+    void listPlanets_ByUnxistingClimateAndTerrain_shouldReturnEmptyList() throws Exception {
+        String unexistingClimate = "Unexisting Climate";
+        String unexistingTerrain = "Unexisting Terrain";
+
+        mockMvc.perform(get("/planets?" + String.format("climate=%s&terrain=%s", unexistingClimate, unexistingTerrain)).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
 }

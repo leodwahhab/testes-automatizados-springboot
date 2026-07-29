@@ -1,21 +1,21 @@
 package com.example.sw_planet_api.domain;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.data.domain.Example;
+import org.springframework.test.context.jdbc.Sql;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
+import static com.example.sw_planet_api.commons.PlanetConstants.TATOOINE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 
 @DataJpaTest
 public class PlanetRepositoryTest {
@@ -97,5 +97,33 @@ public class PlanetRepositoryTest {
         Optional<Planet> sut = planetRepository.findByName(anyString());
 
         assertThat(sut).isEmpty();
+    }
+
+    @Sql(scripts = "/import_planets.sql")
+    @Test
+    void listPlanets_ByExistingClimateAndTerrain_shouldReturnListWithPlanets() {
+        Example<Planet> queryWithoutFilters = QueryBuilder.buildQuery(new Planet());
+        Example<Planet> queryWithFilters = QueryBuilder.buildQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));
+
+        List<Planet> sutWithoutFilters = planetRepository.findAll(queryWithoutFilters);
+        List<Planet> sutWithFilters = planetRepository.findAll(queryWithFilters);
+
+        assertThat(sutWithoutFilters.isEmpty()).isFalse();
+        assertThat(sutWithoutFilters.size()).isEqualTo(3);
+
+        assertThat(sutWithFilters.isEmpty()).isFalse();
+        assertThat(sutWithFilters.size()).isEqualTo(1);
+        assertThat(sutWithFilters.getFirst()).isEqualTo(TATOOINE);
+    }
+
+    @Test
+    void listPlanets_ByUnxistingClimateAndTerrain_shouldReturnEmptyList() {
+        String unexistingClimate = "Unexisting Climate";
+        String unexistingTerrain = "Unexisting Terrain";
+        Example<Planet> query = QueryBuilder.buildQuery(new Planet(unexistingClimate, unexistingTerrain));
+
+        List<Planet> sut = planetRepository.findAll(query);
+
+        assertThat(sut.isEmpty()).isTrue();
     }
 }

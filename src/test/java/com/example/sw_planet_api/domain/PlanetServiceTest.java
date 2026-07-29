@@ -59,9 +59,9 @@ class PlanetServiceTest {
 
     @Test
     public void getPlanet_ByExistingId_ReturnPlanet() {
-        when(planetService.get(1L)).thenReturn(Optional.of(PLANET));
+        when(planetService.get(VALID_ID)).thenReturn(Optional.of(PLANET));
 
-        Optional<Planet> sut = planetService.get(1L);
+        Optional<Planet> sut = planetService.get(VALID_ID);
 
         assertTrue(sut.isPresent());
         assertEquals(PLANET, sut.get());
@@ -71,7 +71,7 @@ class PlanetServiceTest {
     public void getPLanet_ByUnexistingId_ReturnEmpty() {
         when(planetService.get(anyLong())).thenReturn(Optional.empty());
 
-        Optional<Planet> sut = planetService.get(1L);
+        Optional<Planet> sut = planetService.get(VALID_ID);
 
         assertTrue(sut.isEmpty());
     }
@@ -119,7 +119,7 @@ class PlanetServiceTest {
 
     @Test
     public void deletePlanet_ByExistingId_doesNotThrowException() {
-        assertThatCode(() -> planetService.delete(1L)).doesNotThrowAnyException();
+        assertThatCode(() -> planetService.delete(VALID_ID)).doesNotThrowAnyException();
     }
 
     @Test
