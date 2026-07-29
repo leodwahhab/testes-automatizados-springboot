@@ -18,8 +18,7 @@ import static com.example.sw_planet_api.commons.PlanetConstants.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,5 +128,16 @@ public class PlanetControllerTest {
         mockMvc.perform(get("/planets?" + String.format("climate=%s&terrain=%s", unexistingClimate, unexistingTerrain)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
+    void removePlanet_withExistingId_shouldReturn204() throws Exception {
+        mockMvc.perform(delete("/planets/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void removePlanet_withUnexistingId_shouldReturn404() throws Exception {
+
     }
 }

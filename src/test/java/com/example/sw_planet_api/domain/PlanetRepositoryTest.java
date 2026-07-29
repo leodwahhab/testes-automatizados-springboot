@@ -5,16 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
-import static com.example.sw_planet_api.commons.PlanetConstants.TATOOINE;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static com.example.sw_planet_api.commons.PlanetConstants.*;
+import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.mockito.ArgumentMatchers.*;
 
 @DataJpaTest
@@ -125,5 +124,13 @@ public class PlanetRepositoryTest {
         List<Planet> sut = planetRepository.findAll(query);
 
         assertThat(sut.isEmpty()).isTrue();
+    }
+
+    @Test
+    void removePlanet_withExistingId_shouldRemovePlanet() {
+        testEntityManager.persistAndFlush(PLANET);
+
+        assertThatCode(() -> planetRepository.deleteById(PLANET.getId())).doesNotThrowAnyException();
+        assertThat(testEntityManager.find(Planet.class, PLANET.getId())).isNull();
     }
 }
