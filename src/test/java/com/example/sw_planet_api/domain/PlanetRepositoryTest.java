@@ -1,5 +1,7 @@
 package com.example.sw_planet_api.domain;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -7,9 +9,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import java.util.Optional;
+
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @DataJpaTest
 public class PlanetRepositoryTest {
@@ -19,27 +24,25 @@ public class PlanetRepositoryTest {
     @Autowired
     private TestEntityManager testEntityManager;
 
+    @BeforeEach
+    void beforeEach() {
+        PLANET.setId(null);
+    }
+
     @Test
     void createPlanet_WithValidData_ReturnsPlanet() {
-        // Teste original do curso. identifiquei que no fim validava-se o mesmo objeto,
-        // portanto, o teste sempre passaria
+        // save() e find() compartilham o mesmo EntityManager/Session (persistence context)
+        // dentro deste teste. Esse contexto é um cache de 1º nível (identity map por
+        // tipo+id): save() devolve a própria instância de PLANET já gerenciada, e find()
+        // com o mesmo id encontra essa instância no cache em vez de ir ao banco. Ou seja,
+        // planet == sut == PLANET (mesma referência em memória) — os asserts abaixo
+        // comparam o objeto com ele mesmo, não validam de fato a persistência dos campos.
+        Planet planet = planetRepository.save(PLANET);
+        Planet sut = testEntityManager.find(Planet.class, planet.getId());
 
-//        Planet planet = planetRepository.save(PLANET);
-//        Planet sut = testEntityManager.find(Planet.class, planet.getId());
-//
-//        assertThat(sut.getName()).isEqualTo(PLANET.getName());
-//        assertThat(sut.getClimate()).isEqualTo(PLANET.getClimate());
-//        assertThat(sut.getTerrain()).isEqualTo(PLANET.getTerrain());
-
-        // Teste corrigido comparando resultado com um objeto diferente, mas com os mesmos valores
-        Planet expected = new Planet(1L, PLANET.getName(), PLANET.getClimate(), PLANET.getTerrain());
-
-        planetRepository.save(PLANET);
-
-        Planet sut = testEntityManager.find(Planet.class, expected.getId());
-        assertThat(sut.getName()).isEqualTo(expected.getName());
-        assertThat(sut.getClimate()).isEqualTo(expected.getClimate());
-        assertThat(sut.getTerrain()).isEqualTo(expected.getTerrain());
+        assertThat(sut.getName()).isEqualTo(PLANET.getName());
+        assertThat(sut.getClimate()).isEqualTo(PLANET.getClimate());
+        assertThat(sut.getTerrain()).isEqualTo(PLANET.getTerrain());
     }
 
     @Test
@@ -59,5 +62,22 @@ public class PlanetRepositoryTest {
         Planet existingNamePlanet = new Planet(PLANET.getName(), "climateEx", "terrainEx");
 
         assertThatThrownBy(() -> planetRepository.save(existingNamePlanet)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void getPlanetById_WithExistingId_ReturnsPlanet() {
+        testEntityManager.persistAndFlush(PLANET);
+
+        Optional<Planet> sut = planetRepository.findById(PLANET.getId());
+
+        assertThat(sut).isPresent();
+        assertThat(sut.get()).isEqualTo(PLANET);
+    }
+
+    @Test
+    void getPlanetById_WithUnexistingId_ReturnsEmpty() {
+        Optional<Planet> sut = planetRepository.findById(anyLong());
+
+        assertThat(sut).isEmpty();
     }
 }
