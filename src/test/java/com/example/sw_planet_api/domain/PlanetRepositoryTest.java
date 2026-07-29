@@ -15,6 +15,7 @@ import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @DataJpaTest
 public class PlanetRepositoryTest {
@@ -77,6 +78,23 @@ public class PlanetRepositoryTest {
     @Test
     void getPlanetById_WithUnexistingId_ReturnsEmpty() {
         Optional<Planet> sut = planetRepository.findById(anyLong());
+
+        assertThat(sut).isEmpty();
+    }
+
+    @Test
+    void getPlanetById_WithExistingName_ReturnsPlanet() {
+        testEntityManager.persistAndFlush(PLANET);
+
+        Optional<Planet> sut = planetRepository.findByName(PLANET.getName());
+
+        assertThat(sut).isPresent();
+        assertThat(sut.get()).isEqualTo(PLANET);
+    }
+
+    @Test
+    void getPlanetById_WithUnexistingName_ReturnsEmpty() {
+        Optional<Planet> sut = planetRepository.findByName(anyString());
 
         assertThat(sut).isEmpty();
     }

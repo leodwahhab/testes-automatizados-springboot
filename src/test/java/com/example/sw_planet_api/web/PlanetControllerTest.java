@@ -15,6 +15,7 @@ import java.util.Optional;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -84,6 +85,21 @@ public class PlanetControllerTest {
     @Test
     void getPlanet_byUnexistingId_shouldReturnNotFound() throws Exception {
         mockMvc.perform(get("/planets/1").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getPlanet_byExistingName_shouldReturnPlanet() throws Exception {
+        when(planetService.getByName(anyString())).thenReturn(Optional.of(PLANET));
+
+        mockMvc.perform(get("/planets/name/name").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(PLANET));
+    }
+
+    @Test
+    void getPlanet_byUnexistingName_shouldReturnNotFound() throws Exception {
+        mockMvc.perform(get("/planets/name/name").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
