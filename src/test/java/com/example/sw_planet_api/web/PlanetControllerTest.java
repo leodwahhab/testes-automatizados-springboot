@@ -135,9 +135,4 @@ public class PlanetControllerTest {
         mockMvc.perform(delete("/planets/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
     }
-
-    @Test
-    void removePlanet_withUnexistingId_shouldReturn404() throws Exception {
-
-    }
 }

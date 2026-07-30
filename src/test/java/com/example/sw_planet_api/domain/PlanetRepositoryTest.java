@@ -76,7 +76,7 @@ public class PlanetRepositoryTest {
 
     @Test
     void getPlanetById_WithUnexistingId_ReturnsEmpty() {
-        Optional<Planet> sut = planetRepository.findById(anyLong());
+        Optional<Planet> sut = planetRepository.findById(INVALID_ID);
 
         assertThat(sut).isEmpty();
     }
@@ -93,7 +93,7 @@ public class PlanetRepositoryTest {
 
     @Test
     void getPlanetById_WithUnexistingName_ReturnsEmpty() {
-        Optional<Planet> sut = planetRepository.findByName(anyString());
+        Optional<Planet> sut = planetRepository.findByName(INVALID_PLANET.getName());
 
         assertThat(sut).isEmpty();
     }
