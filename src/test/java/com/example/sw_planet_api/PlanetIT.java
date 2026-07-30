@@ -11,10 +11,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 
 import static com.example.sw_planet_api.commons.PlanetConstants.PLANET;
+import static com.example.sw_planet_api.commons.PlanetConstants.TATOOINE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("it")
 @SpringBootTest(webEnvironment =  SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = {"/import_planets.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = {"/remove_planets.sql"}, executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 public class PlanetIT {
     @Autowired
@@ -31,4 +33,11 @@ public class PlanetIT {
         assertThat(sut.getBody().getTerrain()).isEqualTo(PLANET.getTerrain());
     }
 
+    @Test
+    void getPlanet_returnsPlanet() {
+        ResponseEntity<Planet> sut = restTemplate.getForEntity("/planets/1", Planet.class);
+
+        assertThat(sut.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(sut.getBody()).isEqualTo(TATOOINE);
+    }
 }
