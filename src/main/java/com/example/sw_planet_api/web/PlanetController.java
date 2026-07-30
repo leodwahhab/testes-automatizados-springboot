@@ -35,7 +35,7 @@ public class PlanetController {
     @GetMapping
     public ResponseEntity<?> findByClimateAndTerrain(@RequestParam(value = "climate", required = false) String climate,
                                                      @RequestParam(value = "terrain", required = false) String terrain) {
-        return ResponseEntity.ok().body(pLanetService.getByTerrainAndClimate(terrain, climate));
+        return ResponseEntity.ok().body(pLanetService.getByTerrainAndClimate(climate, terrain));
     }
 
     @DeleteMapping("/{id}")

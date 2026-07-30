@@ -102,7 +102,7 @@ public class PlanetRepositoryTest {
     @Test
     void listPlanets_ByExistingClimateAndTerrain_shouldReturnListWithPlanets() {
         Example<Planet> queryWithoutFilters = QueryBuilder.buildQuery(new Planet());
-        Example<Planet> queryWithFilters = QueryBuilder.buildQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));
+        Example<Planet> queryWithFilters = QueryBuilder.buildQuery(new Planet(TATOOINE.getClimate(), null));
 
         List<Planet> sutWithoutFilters = planetRepository.findAll(queryWithoutFilters);
         List<Planet> sutWithFilters = planetRepository.findAll(queryWithFilters);

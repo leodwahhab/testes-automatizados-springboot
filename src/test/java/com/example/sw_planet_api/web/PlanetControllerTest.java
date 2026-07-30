@@ -114,7 +114,7 @@ public class PlanetControllerTest {
                 .andExpect(jsonPath("$.size()").value(3));
 
         // por algum motivo tem que se usar o string format pra testar os request parameters
-        mockMvc.perform(get("/planets?" + String.format("terrain=%s&climate=%s", TATOOINE.getClimate(), TATOOINE.getTerrain())).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/planets?" + String.format("climate=%s&terrain=%s", TATOOINE.getClimate(), TATOOINE.getTerrain())).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isNotEmpty())
                 .andExpect(jsonPath("$[0]").value(TATOOINE));
